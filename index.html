@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title> Neon 8-Ball Pool by Minhaj</title>
+    <title>Neon Snooker by Minhaj</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
@@ -178,15 +178,15 @@
 <body>
     <div id="game-wrapper">
         <div id="ui-container">
-            <div id="player1-status">Player 1: N/A</div>
+            <div id="player1-status">Player 1: ?</div>
             <div id="scoreboard">Solids: 0 | Stripes: 0</div>
-            <div id="player2-status">Player 2: N/A</div>
+            <div id="player2-status">Player 2: ?</div>
         </div>
         <div id="game-container">
             <div id="menu">
-                <h1>NEON 8-Ball Pool</h1>
-                <button onclick="startGame()">JOIN GAME</button>
-                <p>Made by Minhaj</p>
+                <h1 id="menu-title">8 Ball Pool</h1>
+                <button id="menu-button" onclick="startGame()">JOIN GAME</button>
+                <p id="menu-text">Made by Minhaj</p>
             </div>
             <button id="restart-button" onclick="resetGame()">RESET</button>
             <div id="power-meter">
@@ -230,7 +230,7 @@
         const BALL_FRICTION_AIR = 0.03;
         const BALL_DENSITY = 0.001;
 
-        // solidNormalSVG: Solid color circle with a white circle in the middle (unchanged)
+        // solidNormalSVG: Solid color circle with a white circle in the middle
         function solidNormalSVG(color) {
             return `<svg width="${BALL_RADIUS * 2}" height="${BALL_RADIUS * 2}" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
                 <defs>
@@ -251,7 +251,7 @@
             </svg>`;
         }
 
-        // solidSelectedSVG: Adds green stroke to the outer circle (unchanged)
+        // solidSelectedSVG: Adds green stroke to the outer circle
         function solidSelectedSVG(color) {
             return `<svg width="${BALL_RADIUS * 2}" height="${BALL_RADIUS * 2}" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
                 <defs>
@@ -273,7 +273,7 @@
             </svg>`;
         }
 
-        // stripeNormalSVG: Solid color with two white stripes (unchanged)
+        // stripeNormalSVG: Solid color with two white stripes
         function stripeNormalSVG(color) {
             return `<svg width="${BALL_RADIUS * 2}" height="${BALL_RADIUS * 2}" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
                 <defs>
@@ -295,7 +295,7 @@
             </svg>`;
         }
 
-        // stripeSelectedSVG: Adds green stroke (unchanged)
+        // stripeSelectedSVG: Adds green stroke
         function stripeSelectedSVG(color) {
             return `<svg width="${BALL_RADIUS * 2}" height="${BALL_RADIUS * 2}" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
                 <defs>
@@ -318,7 +318,7 @@
             </svg>`;
         }
 
-        // Updated eightBallSVG: Solid black with white "8" text, heptagon removed
+        // eightBallSVG: Solid black with white "8" text, no heptagon
         function eightBallSVG() {
             return `<svg width="${BALL_RADIUS * 2}" height="${BALL_RADIUS * 2}" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
                 <defs>
@@ -339,7 +339,6 @@
             </svg>`;
         }
 
-        // Rest of the game logic remains unchanged
         function updateBallAppearance() {
             const currentType = currentPlayer === 1 ? player1Type : player2Type;
             balls.forEach(ball => {
@@ -385,6 +384,10 @@
             document.getElementById('player1-status').textContent = 'Player 1: ?';
             document.getElementById('player2-status').textContent = 'Player 2: ?';
             document.getElementById('scoreboard').textContent = 'Solids: 0 | Stripes: 0';
+            document.getElementById('menu-title').textContent = '8 Ball Pool';
+            document.getElementById('menu-button').textContent = 'JOIN GAME';
+            document.getElementById('menu-button').onclick = startGame;
+            document.getElementById('menu-text').textContent = 'Made by Minhaj';
             document.getElementById('menu').classList.remove('hidden');
             document.getElementById('ui-container').style.display = 'none';
             document.getElementById('power-meter').style.display = 'none';
@@ -736,15 +739,14 @@
         }
 
         function endGame() {
-            const winner = currentPlayer;
-            const loser = currentPlayer === 1 ? 2 : 1;
+            const winner = currentPlayer === 1 ? 2 : 1; // The player who potted the 8-ball loses
+            const loser = currentPlayer;
             isShooting = false;
+            document.getElementById('menu-title').textContent = `Player ${winner} Wins!`;
+            document.getElementById('menu-button').textContent = 'PLAY AGAIN';
+            document.getElementById('menu-button').onclick = resetGame;
+            document.getElementById('menu-text').textContent = `Player ${loser} potted the 8-ball`;
             document.getElementById('menu').classList.remove('hidden');
-            document.getElementById('menu').innerHTML = `
-                <h1>Player ${winner} Wins!</h1>
-                <button onclick="resetGame()">PLAY AGAIN</button>
-                <p>Player ${loser} potted the 8-ball</p>
-            `;
             document.getElementById('power-meter').style.display = 'none';
         }
     </script>
