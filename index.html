@@ -714,6 +714,7 @@
             });
         }
 
+        // Updated processBallRemoval function
         function processBallRemoval(ball) {
             World.remove(world, ball);
             const index = balls.indexOf(ball);
@@ -722,20 +723,31 @@
             }
             if (ball.label === 'eight') {
                 endGame();
-            } else if (!player1Type) {
-                player1Type = ball.label;
-                player2Type = ball.label === 'solids' ? 'stripes' : 'solids';
-                document.getElementById('player1-status').textContent = `Player 1: ${player1Type.charAt(0).toUpperCase() + player1Type.slice(1)}`;
-                document.getElementById('player2-status').textContent = `Player 2: ${player2Type.charAt(0).toUpperCase() + player2Type.slice(1)}`;
-                updateScore(currentPlayer, 1);
-                scoredThisTurn = true;
-                updateBallAppearance();
-            } else if ((currentPlayer === 1 && player1Type === ball.label) ||
-                      (currentPlayer === 2 && player2Type === ball.label)) {
-                updateScore(currentPlayer, 1);
-                scoredThisTurn = true;
             } else {
-                switchTurn();
+                if (!player1Type) {
+                    // First ball potted, assign types
+                    player1Type = ball.label;
+                    player2Type = ball.label === 'solids' ? 'stripes' : 'solids';
+                    document.getElementById('player1-status').textContent = `Player 1: ${player1Type.charAt(0).toUpperCase() + player1Type.slice(1)}`;
+                    document.getElementById('player2-status').textContent = `Player 2: ${player2Type.charAt(0).toUpperCase() + player2Type.slice(1)}`;
+                    updateScore(currentPlayer, 1);
+                    scoredThisTurn = true;
+                    updateBallAppearance();
+                } else {
+                    // Types are already assigned
+                    let scoringPlayer;
+                    if (ball.label === player1Type) {
+                        scoringPlayer = 1;
+                    } else if (ball.label === player2Type) {
+                        scoringPlayer = 2;
+                    }
+                    if (scoringPlayer) {
+                        updateScore(scoringPlayer, 1);
+                        if (scoringPlayer === currentPlayer) {
+                            scoredThisTurn = true;
+                        }
+                    }
+                }
             }
         }
 
