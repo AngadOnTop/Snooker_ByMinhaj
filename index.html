@@ -222,6 +222,8 @@
         let arrowStart = null, arrowEnd = null;
         let scoredThisTurn = false;
         let ballsToRemove = [];
+        let lastCollisionSoundTime = 0; // Added for sound cooldown
+        const COLLISION_SOUND_COOLDOWN = 100; // Added: 100ms cooldown
 
         const BALL_CATEGORY = 0x0001;
         const POCKET_CATEGORY = 0x0002;
@@ -382,6 +384,7 @@
             pockets = [];
             ballsToRemove = [];
             scoredThisTurn = false;
+            lastCollisionSoundTime = 0; // Reset sound cooldown
             document.getElementById('player1-status').textContent = 'Player 1: ?';
             document.getElementById('player2-status').textContent = 'Player 2: ?';
             document.getElementById('scoreboard').textContent = 'Solids: 0 | Stripes: 0';
@@ -553,13 +556,18 @@
 
             Events.on(engine, 'collisionStart', function(event) {
                 const pairs = event.pairs;
-                for (let i = 0; i < pairs.length; i++) {
-                    const pair = pairs[i];
-                    if (pair.bodyA.label === 'cueBall' || pair.bodyB.label === 'cueBall' ||
-                        (pair.bodyA.label !== 'wall' && pair.bodyB.label !== 'wall')) {
-                        collisionSound.currentTime = 0;
-                        collisionSound.play();
-                        break;
+                const currentTime = Date.now();
+                
+                if (currentTime - lastCollisionSoundTime >= COLLISION_SOUND_COOLDOWN) {
+                    for (let i = 0; i < pairs.length; i++) {
+                        const pair = pairs[i];
+                        if (pair.bodyA.label === 'cueBall' || pair.bodyB.label === 'cueBall' ||
+                            (pair.bodyA.label !== 'wall' && pair.bodyB.label !== 'wall')) {
+                            collisionSound.currentTime = 0;
+                            collisionSound.play();
+                            lastCollisionSoundTime = currentTime;
+                            break;
+                        }
                     }
                 }
             });
@@ -714,7 +722,6 @@
             });
         }
 
-        // Updated processBallRemoval function
         function processBallRemoval(ball) {
             World.remove(world, ball);
             const index = balls.indexOf(ball);
@@ -725,7 +732,6 @@
                 endGame();
             } else {
                 if (!player1Type) {
-                    // First ball potted, assign types
                     player1Type = ball.label;
                     player2Type = ball.label === 'solids' ? 'stripes' : 'solids';
                     document.getElementById('player1-status').textContent = `Player 1: ${player1Type.charAt(0).toUpperCase() + player1Type.slice(1)}`;
@@ -734,7 +740,6 @@
                     scoredThisTurn = true;
                     updateBallAppearance();
                 } else {
-                    // Types are already assigned
                     let scoringPlayer;
                     if (ball.label === player1Type) {
                         scoringPlayer = 1;
